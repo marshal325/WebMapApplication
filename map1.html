@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>COVID-19 Rates in the US</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map1 { position:absolute; top:0; bottom:0; width:100%; }
+        /* Add additional CSS styling if necessary */
+    </style>
+</head>
+<body>
+    <div id="map1"></div>
+    <script>
+        mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+        var map = new mapboxgl.Map({
+            container: 'map1',
+            style: 'mapbox://styles/mapbox/light-v10', // Choose a light base map
+            center: [-95.7129, 37.0902], // Centered on the US
+            zoom: 3
+        });
+
+        map.on('load', function() {
+            map.addSource('covidRates', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/marshal325/WebMapApplication/main/assets/us-covid-2020-rates.json'
+            });
+
+            map.addLayer({
+                'id': 'covid-rates-layer',
+                'type': 'fill',
+                'source': 'covidRates',
+                'layout': {},
+                'paint': {
+                    'fill-color': {
+                        // Define your color scale here
+                    },
+                    'fill-opacity': 0.7
+                }
+            });
+
+            // Add additional map functionalities as needed
+        });
+    </script>
+</body>
+</html>
