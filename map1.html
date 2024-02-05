@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>COVID-19 Rates in the US</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map1 { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #legend { background: white; border-radius: 3px; padding: 10px; position: absolute; bottom: 30px; right: 10px; }
+        #title { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div id="map1"></div>
+    <div id="legend"></div>
+    <div id="title">
+        <h3>COVID-19 Rates in the United States</h3>
+        <p>This map shows the distribution of COVID-19 rates in the US.</p>
+        <p>Data source: New York Times and U.S. Census Bureau</p>
+    </div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
+        var map = new mapboxgl.Map({
+            container: 'map1',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-95.7129, 37.0902],
+            zoom: 3
+        });
+
+        map.on('load', function() {
+            map.addSource('covidRates', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/marshal325/WebMapApplication/main/assets/us-covid-2020-rates.json'
+            });
+
+            map.addLayer({
+                'id': 'covid-rates-layer',
+                'type': 'fill',
+                'source': 'covidRates',
+                'paint': {
+                    'fill-color': {
+                        'property': 'rate',
+                        'stops': [
+                            [0, '#FFEDA0'],
+                            [50, '#FEB24C'],
+                            [100, '#F03B20']
+                        ]
+                    },
+                    'fill-opacity': 0.7
+                }
+            });
+
+            map.on('click', 'covid-rates-layer', function(e) {
+                var coordinates = e.lngLat;
+                var description = e.features[0].properties.rate;
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML('COVID-19 Rates in this area')
+                    .addTo(map);
+            });
+
+            // Build out the legend
+            var legend = document.getElementById('legend');
+            legend.innerHTML = '<strong>Legend</strong><br />' +
+                                '<span style="background-color: #FFEDA0;">&nbsp;&nbsp;&nbsp;&nbsp;</span> 0-49<br />' +
+                                '<span style="background-color: #FEB24C;">&nbsp;&nbsp;&nbsp;&nbsp;</span> 50-99<br />' +
+                                '<span style="background-color: #F03B20;">&nbsp;&nbsp;&nbsp;&nbsp;</span> 100+<br />' +
+                                '';
+        });
+    </script>
+</body>
+</html>
